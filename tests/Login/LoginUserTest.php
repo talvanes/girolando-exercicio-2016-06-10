@@ -19,14 +19,36 @@ class LoginUserTest extends TestCase
     public function testLogin()
     {
         try {
-            $user = factory(User::class)->create();
+            $user = User::create([
+                'name' => "Talvanes",
+                'email' => 'talba@email.com',
+                'password' => bcrypt('123456'),
+                'remember_token' => '123456',
+            ]);
+            /*$user = new User([
+                'name' => "Talvanes",
+                'email' => 'talba@email.com',
+                'password' => bcrypt('123456'),
+                'remember_token' => '123456',
+            ]);*/
 
             $response = $this
-                ->visit('/login')
+                ->visit(url('/login'))
                 ->type($user->email, 'email')
-                ->type($user->password, 'password')
-                ->check('remember')
-                ->seePageIs(route('dashboard.index'));
+                ->type($user->remember_token, 'password')
+                ->press('Login')
+                ->followRedirects()
+                ->assertResponseOk();
+                /*->seeCredentials([
+                    'email' => $user->email,
+                    'password' => $user->password,
+                ])*/
+                #->type($user->email, 'email')
+                #->type($user->password, 'password')
+                #->check('remember')
+                #->seePageIs(route('dashboard.index'));
+                #->assertResponseOk();
+                #->assertRedirectedTo(route('dashboard.index'));
 
             echo print_r($response->response->getStatusCode());
 
@@ -43,18 +65,14 @@ class LoginUserTest extends TestCase
     public function testRegister()
     {
         try {
-            $userData = [
-                'name' => "Talvanes",
-                'email' => 'talba@email.com',
-                'password' => bcrypt(str_random(10)),
-                'remember_token' => str_random(10),
-            ];
+            $user = factory(User::class)->create();
 
-            $response = $this
-                ->post(url('/register'), $userData);
-                #->assertRedirectedToRoute('dashboard.index');
+            $this
+                ->post(url('/register'), $user->getAttributes())
+                ->followRedirects()
+                ->assertResponseOk();
 
-            echo print_r($response->response->getContent());
+            #echo print_r($response->response->getContent());
 
         } catch (\Exception $e) {
             $this->assertTrue(false, "Exception: {$e->getMessage()}, on file: {$e->getFile()}, line #{$e->getLine()}");

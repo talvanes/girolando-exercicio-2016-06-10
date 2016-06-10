@@ -15,7 +15,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::group(['middleware' => 'auth'], function(){
+Route::group(['middleware' => ['auth', 'web']], function(){
     #Route::resource('login', 'Login\LoginController');
     Route::resource('dashboard', 'Login\DashboardController',
         ['only' => 'index']);
