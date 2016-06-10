@@ -10,8 +10,9 @@ use TestCase;
 class LoginUserTest extends TestCase
 {
     use WithoutMiddleware, DatabaseTransactions;
+
     /**
-     * A basic test example.
+     * Teste de login
      *
      * @return void
      */
@@ -25,8 +26,6 @@ class LoginUserTest extends TestCase
                 'remember_token' => str_random(10),
             ]);
 
-            #echo print_r($userData);
-
             $response = $this
                 ->actingAs($user)
                 ->post(url('/login'))
@@ -39,6 +38,11 @@ class LoginUserTest extends TestCase
         }
     }
 
+    /**
+     * Teste de cadastro de usuário.
+     *
+     * @return void
+     */
     public function testRegister()
     {
         try {
@@ -49,9 +53,11 @@ class LoginUserTest extends TestCase
                 'remember_token' => str_random(10),
             ];
 
-            $this
+            $response = $this
                 ->post(url('/register'), $userData)
-                ->assertRedirectedTo(route('dashboard.index'));
+                ->assertRedirectedToRoute('dashboard.index');
+
+            echo print_r($response->response->getContent());
 
         } catch (\Exception $e) {
             $this->assertTrue(false, "Exception: {$e->getMessage()}, on file: {$e->getFile()}, line #{$e->getLine()}");
